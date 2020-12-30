@@ -17,7 +17,7 @@
 <div class='row' id='mars_news'>
     <div class='col-md-12'>
         <h3 id='latest_mars_news' style='padding: 50px 0px 0px 30px'>Latest Mars News</h3>
-        <h4 class='heading' id='headline' style='padding: 0px 50px 0px 30px'>{{Mars_Info.headline}}</h4>
+        <h4 class='heading' id='headline' style='padding: 0px 50px 0px 30px'>{{mars_data.headline}}</h4>
         <p id='paragraph' style='padding: 0px 50px 0px 30px'>{{mars_data.paragraph}}</p>
     </div>
     <div class='col-md-12'>
@@ -30,8 +30,6 @@
             <div class='col-md-2'>
             </div>
             <div class='col-md-5' id='weather' style='padding: 100px 0px 0px 0px'>
-                <h4>Current Weather on Mars</h4>
-                <p style='padding: 25px 50px 0px 0px'>{{mars_data.weather}}</p>
                 <div id='table' class='dataframe' style='padding: 25px 30px 0px 0px'>
                     {{mars_data.facts | safe}}
                 </div>
