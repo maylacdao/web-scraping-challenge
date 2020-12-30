@@ -1,19 +1,19 @@
 # CONVERT JUPYTER NOTEBOOK TO PYTHON SCRIPT.
 
-# Import dependencies
-import pandas as pd
-import json
-import requests
-from bs4 import BeautifulSoup as bs
-import splinter
-from splinter import Browser
-from splinter.exceptions import ElementDoesNotExist
-import time
+def scrape():
 
-# Set executable path and initialize chrome browser.
+    # Import dependencies
+    import pandas as pd
+    import json
+    import requests
+    from bs4 import BeautifulSoup as bs
+    import splinter
+    from splinter import Browser
+    from splinter.exceptions import ElementDoesNotExist
+    import time
 
+    # Set executable path and initialize chrome browser.
 
-def initialize_browser():
     # For MAC users:
     # executable_path = {'executable path': '../Missions_to_Mars/chromedriver'}
     # return Browser('chrome', **executable_path, headless=False)
@@ -21,103 +21,139 @@ def initialize_browser():
     # For Windows users:
     executable_path = {
         'executable path': '../Missions_to_Mars/chromedriver.exe'}
-    return Browser('chrome', **executable_path, headless=False)
+    browser = Browser('chrome', **executable_path, headless=False)
 
+    ################
+    # NASA MARS NEWS
+    ################
 
-# Create global dictionary to be loaded in MongoDB.
-Mars_Info = {}
+    # View NASA news website using splinter.
+    url = 'https://mars.nasa.gov/news/'
+    browser = Browser('chrome', **executable_path, headless=False)
+    browser.visit(url)
 
+    # Define html object and parse using BeautifulSoup.
+    html = browser.html
+    soup = bs(html, 'html.parser')
+    print(soup.prettify())
 
-################
-# NASA MARS NEWS
-################
+    # Specify target webpage element:
+    slide_element = soup.select_one("ul.item_list li.slide")
 
-# Create function to scrape latest NASA Mars news.
-def scrape_news():
+    # Retrieve most recent news title and corresponding paragraph text:
+    news_title = slide_element.find(
+        'div', class_='content_title').get_text()
+    news_p = slide_element.find(
+        'div', class_='article_teaser_body').get_text()
 
-    try:
+    # Quit browser:
+    browser.quit()
 
-        # Initialize browser
-        browser = initialize_browser()
-        #browser.is_element_present_by_css("img.jpg", wait_time=1)
+    ################
+    # FEATURED JPL MARS SPACE IMAGE
+    ################
 
-        # View NASA news website using splinter.
-        url = 'https://mars.nasa.gov/news/'
-        browser.visit(url)
+    init_url = 'https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars'
+    browser = Browser('chrome', **executable_path, headless=False)
+    browser.visit(init_url)
 
-        # Define html object and parse using BeautifulSoup.
-        html = browser.html
-        soup = bs(html, 'html.parser')
-        print(soup.prettify())
+    # Define html object and parse using BeautifulSoup.
+    html = browser.html
+    soup = bs(html, 'html.parser')
+    print(soup.prettify())
 
-        # Specify target webpage element:
-        slide_element = soup.select_one("ul.item_list li.slide")
+    # Specify target webpage element:
+    full_image_button = soup.find(class_="button fancybox")
 
-        # Retrieve most recent news title and corresponding paragraph text:
-        news_title = slide_element.find(
-            'div', class_='content_title').get_text()
-        news_p = slide_element.find(
-            'div', class_='article_teaser_body').get_text()
+    # Instruct splinter to click on 'FULL IMAGE' button:
+    browser.click_link_by_id('full_image')
+    time.sleep(2)
 
-        # Display results:
-        print(news_title)
-        print('---------------')
-        print(news_p)
+    # Instruct splinter to click on 'more info' button:
+    browser.click_link_by_partial_text('more info')
 
-        # Incorporate results into dictionary:
-        Mars_Info['news_title'] = news_title
-        Mars_Info['news_p'] = news_p
+    # Parse resulting html page:
+    html = browser.html
+    image_soup = bs(html, "html.parser")
 
-        return Mars_Info
+    # Retrieve relevant url for full-size featured image:
+    img_url = image_soup.select_one("figure.lede a img").get("src")
+    img_url
 
-    finally:
+    # Using the initial url, build the complete url for the full-sized featured image:
+    featured_image_url = f"https://www.jpl.nasa.gov{img_url}"
 
-        # Quit browser:
-        browser.quit()
+    # Quit browser:
+    browser.quit()
 
-################
-# FEATURED JPL MARS SPACE IMAGE
-################
+    ###########
+    # MARS FACTS
+    ###########
 
+    # View Mars Facts website using the splinter module:
+    facts_url = 'https://space-facts.com/mars/'
+    browser.visit(facts_url)
 
-def scrape_featured_image():
+    # Using Pandas, scrape facts table:
+    mars_facts = pd.read_html(facts_url)
 
-    try:
+    # Assign Mars facts dataframe to 'mars_facts':
+    mars_facts = mars_facts[0]
 
-        # Initialize browser
-        browser = initialize_browser()
-        #browser.is_element_present_by_css("img.jpg", wait_time=1)
+    # Set index and display facts table:
+    mars_facts = mars_facts.rename(
+        columns={0: 'Mars Planet Profile', 1: ''})
+    mars_facts.set_index('Mars Planet Profile')
 
-        # View JPL website using the splinter module:
-        init_url = 'https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars'
-        browser.visit(init_url)
+    # Convert the data to a HTML table string:
+    mars_html = mars_facts.to_html(index=False, table_id='fact_table')
+    mars_html
 
-        # Define html object and parse using BeautifulSoup.
-        html = browser.html
-        soup = bs(html, 'html.parser')
-        print(soup.prettify())
+    # Quit browser:
+    browser.quit()
 
-        # Specify target webpage element:
-        full_image_button = soup.find(class_="button fancybox")
+    ####################
+    # MARS HEMISPHERES
+    ####################
 
-        # Instruct splinter to click on 'FULL IMAGE' button:
-        browser.click_link_by_id('full_image')
-        time.sleep(2)
+   # View USGS Astrogeology website using splinter module:
+    hemisphere_url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    browser = Browser("chrome", **executable_path)
+    browser.visit(hemisphere_url)
 
-        # Instruct splinter to click on 'more info' button:
-        browser.click_link_by_partial_text('more info')
+    # Build a for loop to retrieve a list of the hemisphere image urls:
+    hemisphere_image_urls = []
 
-        # Parse resulting html page:
-        html = browser.html
-        image_soup = bs(html, "html.parser")
+    url = browser.find_by_css("a.product-item h3")
+    for i in range(len(url)):
+        hemisphere = {}
 
-        # Incorporate results into dictionary:
-        Mars_Info['news_title'] = news_title
-        Mars_Info['news_p'] = news_p
+        # Find element on each loop:
+        browser.find_by_css("a.product-item h3")[i].click()
 
-        return Mars_Info
+        # Find sample image anchor tag & extract <href> portion:
+        sample_element = browser.find_link_by_text("Sample").first
+        hemisphere["img_url"] = sample_element["href"]
 
-    finally:
+        # Get hemisphere name(title):
+        hemisphere["title"] = browser.find_by_css("h2.title").text
 
-        # Quit browser:
-        browser.quit()
+        # Append to list:
+        hemisphere_image_urls.append(hemisphere)
+
+        # Navigate backwards:
+        browser.back()
+
+        # Display list:
+        hemisphere_image_urls
+
+    ################
+    # SUMMARIZE INFO
+    ################
+    Mars_Info = {'headline': news_title,
+                 'paragraph': news_p,
+                 'featured_image': featured_image_url,
+                 'facts': mars_html,
+                 'hemispheres': hemisphere_image_urls}
+
+    return Mars_Info
