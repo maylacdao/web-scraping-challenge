@@ -37,48 +37,26 @@
         </div>
     </div>
 </div>
-<div class='container' style='padding: 75px 0px 0px 0px'>
-    <div class='row'>
-        <div class='col-md-6 text-center rounded mx-auto d-block'>
-            <div class='thumbnail'>
-                <img src={{mars_data.hemispheres[0].img_url}}>
-                <p>{{mars_data.hemispheres[0].title}}</p>
-            </div>
-            <div class='caption'>
-                <h4>Cerberus</h4>
-            </div>
-        </div>
-        <div class="col-md-6 text-center rounded mx-auto d-block">
-            <div class="thumbnail">
-                <img src={{mars_data.hemispheres[1].img_url}} margin=auto id='schiaparelli'>
-                <p>{{mars_data.hemispheres[1].title}}</p>
-            </div>
-            <div class='caption'>
-                <h4>Schiaparelli</h4>
-            </div>
-        </div>
-        <div class='row'>
-            <div class='col-md-6 text-center rounded mx-auto d-block'>
-                <div class="thumbnail">
-                    <img src={{mars_data.hemispheres[2].img_url}} margin=auto id='syrtis'>
-                    <p>{{mars_data.hemispheres[2].title}}</p>
-                </div>
-                <div class='caption'>
-                    <h4>Syrtis Major</h4>
+<h4 style="padding-top: 50px; margin-top: 100px; text-align: center;">Mars Hemispheres</h4>
+<div class="card-deck">
+    <hr>
+    <div class="col-md-12">
+        <div class="row" id="mars-hemispheres">
+            {% for hemisphere in mars.hemispheres %}
+            <div class="col-md-6">
+                <div class="card text-white bg-danger" style="margin: 30px;">
+                    <!-- If Images are False/None/Non-Existent, Then Default to Error Message -->
+                    <img class="card-img-top" src="{{hemisphere.img_url | default('static/images/error.png', true)}}"
+                        alt="..." />
+                    <div class="card-body">
+                        <p class="card-text">{{hemisphere.title}}</p>
+                    </div>
                 </div>
             </div>
-            <div=class='col-md-6 text-center rounded mx-auto d-block'>
-                <div class="thumbnail">
-                    <img src={{mars_data.hemispheres[3].img_url}} margin=auto id='valles'>
-                    <p>{{mars_data.hemispheres[3].title}}</p>
-                </div>
-                <div class="caption">
-                    <h4>Valles Marineris</h4>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
-
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"
         integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU"
