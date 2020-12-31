@@ -24,7 +24,7 @@
         <div class='row' id='picture'>
             <div class='img-responsive col-md-7'>
                 <h3 id='featured_image_title' style='padding: 50px 50px 0px 30px'>Featured Image</h3>
-                <img src={{mars_data.featured_image}} margin=auto id='featured_image'
+                <img src={{mars_data.featured_image_url}} margin=auto id='featured_image'
                     style='padding: 0px 50px 0px 30px'>
             </div>
             <div class='col-md-2'>
@@ -42,7 +42,7 @@
     <hr>
     <div class="col-md-12">
         <div class="row" id="mars-hemispheres">
-            {% for hemisphere in mars.hemispheres %}
+            {% for hemisphere in mars_data.hemispheres %}
             <div class="col-md-6">
                 <div class="card text-white bg-danger" style="margin: 30px;">
                     <!-- If Images are False/None/Non-Existent, Then Default to Error Message -->
